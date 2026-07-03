@@ -1,5 +1,3 @@
-
-
 // Role Authorization Middleware
 
 export const authorize = (...roles) => {
