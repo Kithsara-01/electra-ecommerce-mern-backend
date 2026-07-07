@@ -24,7 +24,7 @@ export const registerCustomer = async (req, res) => {
         if (existingUser) {
             return res.status(400).json({
                 success: false,
-                message: "Email already exists."
+                message: "Email already exists." // response eken message eka
             });
         }
 
@@ -32,23 +32,23 @@ export const registerCustomer = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
 
         // Create new customer
-        const newCustomer = await User.create({
+        const newCustomer = await User.create({  //  user.create(name, email, etc) function eken mongodb ekata data save karala ita psse mongodb eken ena response eka thamayi me newCustmer kiyana ekata watenne?
             name,
             email,
             password: hashedPassword,
-            phone,
+            phone,   
             address,
             role: "Customer"
         });
 
-        // Send response (without password)
+        // Send response (without password) to backend eken frontend ekata, me response eka frontend eken use karanna puluwan
         return res.status(201).json({
             success: true,
             message: "Customer account created successfully.",
-            user: {
+            user: {  
                 id: newCustomer._id,
                 name: newCustomer.name,
-                email: newCustomer.email,
+                email: newCustomer.email,  
                 phone: newCustomer.phone,
                 address: newCustomer.address,
                 role: newCustomer.role,
