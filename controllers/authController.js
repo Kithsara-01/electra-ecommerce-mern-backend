@@ -137,6 +137,9 @@ export const registerSupplier = async (req, res) => {
 
 // Login (Admin / Customer / Supplier)
 export const loginUser = async (req, res) => {
+
+    //console.log("Login request received");
+
     try {
 
         // Get data from request body
@@ -179,14 +182,14 @@ export const loginUser = async (req, res) => {
         }
 
         // Generate JWT Token
-        const token = jwt.sign(
+        const token = jwt.sign( //  token ekak create karana fucntion eka
             {
-                id: user._id,
+                id: user._id, // signature ekata add karanne me deka
                 role: user.role
             },
             process.env.JWT_SECRET,
             {
-                expiresIn: "7d"
+                expiresIn: "7d"  // token eka valid 7 days 
             }
         );
 
@@ -197,6 +200,8 @@ export const loginUser = async (req, res) => {
             sameSite: "strict",
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 Days
         });
+
+        // console.log("Cookie set successfully");
 
         // Send response
         return res.status(200).json({

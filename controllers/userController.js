@@ -14,7 +14,10 @@ export const getMyProfile = async(req, res) => {
     }
 
     // Send user data
-    res.status(200).json(user);
+    return res.status(200).json({
+      success: true,
+      user: user // කෙලින්ම user ඔබ්ජෙක්ට් එක මේ විදිහට පැකට් කරලා යවන්න
+});
   } catch (error) {
     res.status(500).json({
       message: error.message,
