@@ -40,7 +40,7 @@ export const protect = async (req, res, next) => {
         console.error("Authentication Error:", error);
 
         return res.status(401).json({
-            success: false,
+            success: false, 
             message: "Invalid or expired token."
         });
 
