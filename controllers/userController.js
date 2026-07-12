@@ -43,11 +43,38 @@ export const updateMyProfile = async (req, res) => {
       });
     }
 
-    // Update user details
+
+
+
+  // Update user details
+
+        // Validate phone number
+        if (phone) {
+
+          // Must contain only numbers
+          if (!/^\d+$/.test(phone)) {
+            return res.status(400).json({
+              message: "Phone number must contain only digits",
+            });
+          }
+
+          // Must be exactly 10 digits
+          if (phone.length !== 10) {
+            return res.status(400).json({
+              message: "Phone number must be exactly 10 digits",
+            });
+          }
+
+        }
+
     user.name = name || user.name;
     user.phone = phone || user.phone; 
     user.address = address || user.address;
     user.profileImage = profileImage || user.profileImage;
+
+
+
+
 
     // Save updated user
     await user.save();
