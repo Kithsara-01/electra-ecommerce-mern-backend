@@ -28,11 +28,11 @@ export const getMyProfile = async(req, res) => {
 };
 
 // Update Logged In User Profile
-export const updateMyProfile = async (req, res) => {
 
-    try {
+export const updateMyProfile = async (req, res) => {
+  try {
     // Get data from request body
-    const { name, phone, address, profileImage } = req.body;
+    const { name, email, phone, address, profileImage } = req.body;
 
     // Find logged in user
     const user = await User.findById(req.user._id);
@@ -44,50 +44,54 @@ export const updateMyProfile = async (req, res) => {
       });
     }
 
+    // Check duplicate email
+    if (email && email !== user.email) {
+      const existingUser = await User.findOne({ email });
 
+      if (existingUser) {
+        return res.status(400).json({
+          message: "Email already exists.",
+        });
+      }
+    }
 
+    // Validate phone number
+    if (phone) {
+      // Must contain only numbers
+      if (!/^\d+$/.test(phone)) {
+        return res.status(400).json({
+          message: "Phone number must contain only digits",
+        });
+      }
 
-  // Update user details
+      // Must be exactly 10 digits
+      if (phone.length !== 10) {
+        return res.status(400).json({
+          message: "Phone number must be exactly 10 digits",
+        });
+      }
+    }
 
-        // Validate phone number
-        if (phone) {
-
-          // Must contain only numbers
-          if (!/^\d+$/.test(phone)) {
-            return res.status(400).json({
-              message: "Phone number must contain only digits",
-            });
-          }
-
-          // Must be exactly 10 digits
-          if (phone.length !== 10) {
-            return res.status(400).json({
-              message: "Phone number must be exactly 10 digits",
-            });
-          }
-
-        }
-
+    // Update user details
     user.name = name || user.name;
-    user.phone = phone || user.phone; 
+    user.email = email || user.email;
+    user.phone = phone || user.phone;
     user.address = address || user.address;
     user.profileImage = profileImage || user.profileImage;
-
-
-
-
 
     // Save updated user
     await user.save();
 
     // Send response
-    res.status(200).json({
+    return res.status(200).json({
+      success: true,
       message: "Profile updated successfully",
       user,
     });
 
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
+      success: false,
       message: error.message,
     });
   }
