@@ -1,4 +1,5 @@
 import Product from "../models/product.js";
+import { deleteProductImages } from "../utils/productImageService.js";
 
 // ==============================
 // Create Product
@@ -289,10 +290,9 @@ export const deleteProduct = async (req, res) => {
         message: "Product not found.",
       });
     }
+    await deleteProductImages(product.images);
 
-    // TODO:
-    // Delete all product images
-    // from Supabase before deleting product.
+   
 
     await Product.deleteOne({
       productId: req.params.productId,
