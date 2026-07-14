@@ -1,63 +1,83 @@
-import mongoose, { model } from 'mongoose';
+import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema(
-    {
-        productId : {
-            type : String,
-            unique : true,
-            required : true
-        },
-        name : {
-            type : String,
-            required : true
-        },
-        altNames : {
-            type : [String],
-            default : [],
-            required : true
-        },
-        description : {
-            type : String,
-            required : true
-        },
-        price : {
-            type : Number,
-            required : true
-        },
-        labelledPrice : {
-            type : Number,
-            required : true
-        },
-        images : {
-            type : [String],
-            default : ["/default-product-1.png", "/default-product-2.png"],
-            required : true
-        },
-        isAvailable : {
-            type : Boolean,
-            required : true,
-            default : true
-        },
-        category : {
-            type : String,
-            required : false
-        },
-        stock : {
-            type : Number,
-            required : true,
-            default : 0
-        },
-        brand : {
-            type : String,
-            required : false
-        },
-        model : {
-            type : String,
-            required : false
-        }
-    }
-)
+  {
+    productId: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
 
-const Product = mongoose.model("product" , productSchema)
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
 
-export default Product
+    altNames: {
+      type: [String],
+      default: [],
+      required: true,
+    },
+
+    description: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    price: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+
+    labelledPrice: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+
+    images: {
+      type: [String],
+      default: [],
+      required: true,
+    },
+
+    isAvailable: {
+      type: Boolean,
+      default: true,
+    },
+
+    category: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    stock: {
+      type: Number,
+      required: true,
+      default: 0,
+      min: 0,
+    },
+
+    brand: {
+      type: String,
+      trim: true,
+    },
+
+    model: {
+      type: String,
+      trim: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const Product = mongoose.model("Product", productSchema);
+
+export default Product;
