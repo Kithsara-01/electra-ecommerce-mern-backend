@@ -105,10 +105,14 @@ export const getAllProducts = async (req, res) => {
     }
 
     // Search
+    // Search
+    // Search
     if (search) {
       filter.$or = [
+        { productId: { $regex: search, $options: "i" } },
         { name: { $regex: search, $options: "i" } },
-        { description: { $regex: search, $options: "i" } },
+        { brand: { $regex: search, $options: "i" } },
+        { model: { $regex: search, $options: "i" } },
         { altNames: { $elemMatch: { $regex: search, $options: "i" } } },
       ];
     }
@@ -160,6 +164,7 @@ export const getAllProducts = async (req, res) => {
     const perPage = Number(limit);
 
     const totalProducts = await Product.countDocuments(filter);
+    
 
     const products = await Product.find(filter)
       .sort(sortOption)
