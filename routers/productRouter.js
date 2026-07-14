@@ -1,13 +1,27 @@
-import express from "express"
-import { createProduct, deleteProduct, getAllProducts, getProductById, searchProducts, updateProduct } from "../controllers/productController.js"
+import express from "express";
 
-const productRouter = express.Router()
+import {
+  createProduct,
+  deleteProduct,
+  getAllProducts,
+  getProductById,
+  searchProducts,
+  updateProduct,
+} from "../controllers/productController.js";
 
+import { protect } from "../middlewares/authMiddleware.js";
+import { authorize } from "../middlewares/roleMiddleware.js";
 
-productRouter.post("/" , createProduct)
-productRouter.get("/" , getAllProducts)
-productRouter.get("/search/:query",searchProducts)
-productRouter.get("/:productId" , getProductById)
-productRouter.delete("/:productId" , deleteProduct)
-productRouter.put("/:productId" , updateProduct)
-export default productRouter
+const productRouter = express.Router();
+
+// Public Routes
+productRouter.get("/", getAllProducts);
+productRouter.get("/search/:query", searchProducts);
+productRouter.get("/:productId", getProductById);
+
+// Admin Routes
+productRouter.post("/", protect, authorize("Admin"), createProduct);
+productRouter.put("/:productId", protect, authorize("Admin"), updateProduct);
+productRouter.delete("/:productId", protect, authorize("Admin"), deleteProduct);
+
+export default productRouter;
