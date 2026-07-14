@@ -237,10 +237,29 @@ export const updateProduct = async (req, res) => {
       });
     }
 
-    // TODO:
-    // If new images are uploaded,
-    // delete old images from Supabase
-    // then save new public URLs.
+    const existingProduct = await Product.findOne({
+      productId: req.params.productId,
+    });
+
+    if (!existingProduct) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found.",
+      });
+    }
+
+    const existingImages = existingProduct.images || [];
+    const incomingImages = req.body.images;
+
+    if (Array.isArray(incomingImages)) {
+      const removedImages = existingImages.filter(
+        (image) => !incomingImages.includes(image)
+      );
+
+      if (removedImages.length > 0) {
+        await deleteProductImages(removedImages);
+      }
+    }
 
     const updatedProduct = await Product.findOneAndUpdate(
       {
