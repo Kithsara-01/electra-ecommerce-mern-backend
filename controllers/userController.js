@@ -174,19 +174,59 @@ export const changePassword = async (req, res) => {
 
 // Get All Users (Admin Only)
 export const getAllUsers = async (req, res) => {
-    try {
-    // Get all users
-    const users = await User.find().select("-password");
+  try {
+    const {
+      search = "",
+      role = "all",
+      status = "all",
+      page = 1,
+      limit = 10,
+    } = req.query;
 
-    // Send users
-    res.status(200).json(users);
+    const query = {};
+
+    // Search by name or email
+    if (search.trim()) {
+      query.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Filter by role
+    if (role !== "all") {
+      query.role = role;
+    }
+
+    // Filter by status
+    if (status === "active") {
+      query.isBlocked = false;
+    } else if (status === "blocked") {
+      query.isBlocked = true;
+    }
+
+    const totalUsers = await User.countDocuments(query);
+
+    const users = await User.find(query)
+      .select("-password")
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+
+    return res.status(200).json({
+      success: true,
+      users,
+      totalUsers,
+      currentPage: Number(page),
+      totalPages: Math.ceil(totalUsers / limit),
+    });
 
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
+      success: false,
       message: error.message,
     });
   }
-
 };
 
 // Get Single User By ID (Admin Only)
@@ -226,6 +266,14 @@ export const blockUser = async (req, res) => {
       });
     }
 
+    // Prevent blocking admin users
+    if (user.role === "Admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Admin users cannot be blocked.",
+      });
+    }
+
     // Block user
     user.isBlocked = true;
 
@@ -256,6 +304,14 @@ export const unblockUser = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         message: "User not found",
+      });
+    }
+
+    // Prevent modifying admin users
+    if (user.role === "Admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Admin users cannot be modified.",
       });
     }
 

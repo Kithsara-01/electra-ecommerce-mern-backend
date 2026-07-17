@@ -69,73 +69,9 @@ export const registerCustomer = async (req, res) => {
 
 };
 
-// Supplier Register
-export const registerSupplier = async (req, res) => {
-     try {
 
-        // Get data from request body
-        const { name, email, password, phone, address } = req.body;
 
-        // Validate required fields
-        if (!name || !email || !password || !phone) {
-            return res.status(400).json({
-                success: false,
-                message: "Please fill all required fields."
-            });
-        }
-
-        // Check whether email already exists
-        const existingUser = await User.findOne({ email });
-
-        if (existingUser) {
-            return res.status(400).json({
-                success: false,
-                message: "Email already exists."
-            });
-        }
-
-        // Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Create new supplier
-        const newSupplier = await User.create({
-            name,
-            email,
-            password: hashedPassword,
-            phone,
-            address,
-            role: "Supplier"
-        });
-
-        // Send response (without password)
-        return res.status(201).json({
-            success: true,
-            message: "Supplier account created successfully.",
-            user: {
-                id: newSupplier._id,
-                name: newSupplier.name,
-                email: newSupplier.email,
-                phone: newSupplier.phone,
-                address: newSupplier.address,
-                role: newSupplier.role,
-                isBlocked: newSupplier.isBlocked,
-                createdAt: newSupplier.createdAt,
-                updatedAt: newSupplier.updatedAt
-            }
-        });
-
-    } catch (error) {
-        console.error("Register Supplier Error:", error);
-
-        return res.status(500).json({
-            success: false,
-            message: "Internal Server Error"
-        });
-    }
-
-};
-
-// Login (Admin / Customer / Supplier)
+// Login (Admin / Customer )
 export const loginUser = async (req, res) => {
 
     //console.log("Login request received");

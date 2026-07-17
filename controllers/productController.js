@@ -90,13 +90,13 @@ export const getAllProducts = async (req, res) => {
       search,
       category,
       brand,
+      stockStatus,
       minPrice,
       maxPrice,
       sort = "newest",
       page = 1,
       limit = 10,
     } = req.query;
-
     const filter = {};
 
     // Customers see only available products
@@ -113,6 +113,7 @@ export const getAllProducts = async (req, res) => {
         { name: { $regex: search, $options: "i" } },
         { brand: { $regex: search, $options: "i" } },
         { model: { $regex: search, $options: "i" } },
+        { category: { $regex: search, $options: "i" } },
         { altNames: { $elemMatch: { $regex: search, $options: "i" } } },
       ];
     }
@@ -125,6 +126,26 @@ export const getAllProducts = async (req, res) => {
     // Brand Filter
     if (brand) {
       filter.brand = brand;
+    }
+
+    // Stock Status Filter
+    if (stockStatus && stockStatus !== "All") {
+      switch (stockStatus) {
+        case "In Stock":
+          filter.stock = { $gt: 5 };
+          break;
+
+        case "Low Stock":
+          filter.stock = { $gt: 0, $lte: 5 };
+          break;
+
+        case "Out of Stock":
+          filter.stock = 0;
+          break;
+
+        default:
+          break;
+      }
     }
 
     // Price Filter
@@ -164,6 +185,14 @@ export const getAllProducts = async (req, res) => {
     const perPage = Number(limit);
 
     const totalProducts = await Product.countDocuments(filter);
+
+    const lowStockCount = await Product.countDocuments({
+        stock: { $gt: 0, $lte: 5 },
+      });
+
+      const outOfStockCount = await Product.countDocuments({
+        stock: 0,
+      });
     
 
     const products = await Product.find(filter)
@@ -172,12 +201,15 @@ export const getAllProducts = async (req, res) => {
       .limit(perPage);
 
     return res.status(200).json({
-      success: true,
-      totalProducts,
-      currentPage,
-      totalPages: Math.ceil(totalProducts / perPage),
-      products,
-    });
+        success: true,
+        totalProducts,
+        lowStockCount,
+        outOfStockCount,
+        currentPage,
+        totalPages: Math.ceil(totalProducts / perPage),
+        products,
+      });
+      
   } catch (error) {
     console.error("Get Products Error:", error);
 

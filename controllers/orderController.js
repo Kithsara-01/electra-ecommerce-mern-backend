@@ -271,13 +271,43 @@ export const getMyOrders = async (req, res) => {
 // ===============================
 export const getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find().sort({
-      createdAt: -1,
-    });
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+
+    const search = req.query.search?.trim() || "";
+    const status = req.query.status || "All";
+
+    const query = {};
+
+    // Search
+    if (search) {
+      query.$or = [
+        { customerName: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+        { phone: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Status Filter
+    if (status !== "All") {
+      query.orderStatus = status;
+    }
+
+    const totalOrders = await Order.countDocuments(query);
+
+    const orders = await Order.find(query)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const totalPages = Math.ceil(totalOrders / limit);
 
     return res.status(200).json({
       success: true,
       orders,
+      totalOrders,
+      currentPage: page,
+      totalPages,
     });
   } catch (error) {
     console.error(error);
