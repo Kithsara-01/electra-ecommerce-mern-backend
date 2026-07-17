@@ -1,6 +1,7 @@
 import Order from "../models/order.js";
 import Cart from "../models/cart.js";
 import Product from "../models/product.js";
+import { getDeliveryFee } from "../utils/delivery.js";
 
 // ===============================
 // Place Order
@@ -95,6 +96,27 @@ export const placeOrder = async (req, res) => {
     }));
 
     // ===============================
+    // Check Stock Availability
+    // ===============================
+    for (const item of cart.items) {
+      const product = await Product.findById(item.productId._id);
+
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: `${item.productId.name} not found.`,
+        });
+      }
+
+      if (product.stock < item.quantity) {
+        return res.status(400).json({
+          success: false,
+          message: `Only ${product.stock} item(s) available for ${product.name}.`,
+        });
+      }
+    }
+
+    // ===============================
     // Calculate Pricing
     // ===============================
     const subtotal = items.reduce(
@@ -102,8 +124,10 @@ export const placeOrder = async (req, res) => {
       0
     );
 
-    const deliveryFee = 350;
+    const deliveryFee = getDeliveryFee(district);
+
     const discount = 0;
+
     const grandTotal = subtotal + deliveryFee - discount;
     const totalAmount = subtotal; // For backward compatibility
 
@@ -140,6 +164,20 @@ export const placeOrder = async (req, res) => {
       paymentMethod,
       orderStatus: "Pending",
     });
+
+    // ===============================
+    // Reduce Product Stock
+    // ===============================
+    for (const item of cart.items) {
+      await Product.findByIdAndUpdate(
+        item.productId._id,
+        {
+          $inc: {
+            stock: -item.quantity,
+          },
+        }
+      );
+    }
 
     // Clear cart
     cart.items = [];

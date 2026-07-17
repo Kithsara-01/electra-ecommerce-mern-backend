@@ -300,6 +300,57 @@ export const updateProduct = async (req, res) => {
 };
 
 // ==============================
+// Update Product Stock
+// ==============================
+export const updateProductStock = async (req, res) => {
+  try {
+    const { stock } = req.body;
+
+    if (stock === undefined) {
+      return res.status(400).json({
+        success: false,
+        message: "Stock is required.",
+      });
+    }
+
+    const product = await Product.findOne({
+      productId: req.params.productId,
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found.",
+      });
+    }
+
+    if (Number(stock) < 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Stock cannot be negative.",
+      });
+    }
+
+    product.stock = Number(stock);
+
+    await product.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Stock updated successfully.",
+      product,
+    });
+  } catch (error) {
+    console.error("Update Stock Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update stock.",
+    });
+  }
+};
+
+// ==============================
 // Delete Product
 // ==============================
 export const deleteProduct = async (req, res) => {

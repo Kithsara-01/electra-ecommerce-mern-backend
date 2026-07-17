@@ -10,6 +10,7 @@ import productRouter from "./routers/productRouter.js";
 import orderRouter from "./routers/orderRouter.js";
 
 import cartRouter from "./routers/cartRouter.js";
+import dashboardRouter from "./routers/dashboardRouter.js";
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.use("/api/users", userRouter);
 app.use("/api/products", productRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/cart", cartRouter);
+app.use("/api/dashboard", dashboardRouter);
 
 const PORT = process.env.PORT || 3000; // Set the port to the value from environment variable or default to 3000
 
