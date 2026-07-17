@@ -7,6 +7,7 @@ import {
   getProductById,
   searchProducts,
   updateProduct,
+  updateProductStock,
 } from "../controllers/productController.js";
 
 import { protect } from "../middlewares/authMiddleware.js";
@@ -22,6 +23,7 @@ productRouter.get("/search/:query", searchProducts);
 productRouter.get("/admin", protect, authorize("Admin"), getAllProducts);
 productRouter.post("/", protect, authorize("Admin"), createProduct);
 productRouter.put("/:productId", protect, authorize("Admin"), updateProduct);
+productRouter.patch("/:productId/stock", protect, authorize("Admin"), updateProductStock);
 productRouter.delete("/:productId", protect, authorize("Admin"), deleteProduct);
 
 // Public Route
