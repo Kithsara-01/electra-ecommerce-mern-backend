@@ -7,10 +7,13 @@ import connectDB from "./database/db.js";
 import authRouter from "./routers/authRouter.js";
 import userRouter from "./routers/userRouter.js";
 import productRouter from "./routers/productRouter.js";
+import contactRouter from "./routers/contactRouter.js";
 import orderRouter from "./routers/orderRouter.js";
 
 import cartRouter from "./routers/cartRouter.js";
 import dashboardRouter from "./routers/dashboardRouter.js";
+import wishlistRouter from "./routers/wishlistRouter.js";
+
 
 dotenv.config();
 
@@ -32,9 +35,11 @@ app.use(cookieParser()); // Parse cookies from incoming requests use for this to
 app.use("/api/auth", authRouter); 
 app.use("/api/users", userRouter);
 app.use("/api/products", productRouter);
+app.use("/api/contact", contactRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/dashboard", dashboardRouter);
+app.use("/api/wishlist", wishlistRouter);
 
 const PORT = process.env.PORT || 3000; // Set the port to the value from environment variable or default to 3000
 
