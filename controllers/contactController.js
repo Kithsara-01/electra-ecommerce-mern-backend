@@ -253,6 +253,8 @@ export const replyToContactMessage = async (req, res) => {
 
     if (req.user.role === "Admin") {
       contactMessage.hasUnreadAdminReply = true;
+    } else {
+      contactMessage.isRead = false;
     }
 
     await contactMessage.save();
