@@ -9,6 +9,7 @@ import userRouter from "./routers/userRouter.js";
 import productRouter from "./routers/productRouter.js";
 import contactRouter from "./routers/contactRouter.js";
 import orderRouter from "./routers/orderRouter.js";
+import reviewRouter from "./routers/reviewRouter.js";
 
 import cartRouter from "./routers/cartRouter.js";
 import dashboardRouter from "./routers/dashboardRouter.js";
@@ -37,6 +38,7 @@ app.use("/api/users", userRouter);
 app.use("/api/products", productRouter);
 app.use("/api/contact", contactRouter);
 app.use("/api/orders", orderRouter);
+app.use("/api/reviews", reviewRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/dashboard", dashboardRouter);
 app.use("/api/wishlist", wishlistRouter);

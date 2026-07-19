@@ -63,6 +63,16 @@ const productSchema = new mongoose.Schema(
       min: 0,
     },
 
+    averageRating: {
+      type: Number,
+      default: 0,
+    },
+
+    totalReviews: {
+      type: Number,
+      default: 0,
+    },
+
     brand: {
       type: String,
       trim: true,
