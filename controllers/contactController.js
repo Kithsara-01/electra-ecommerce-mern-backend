@@ -253,6 +253,8 @@ export const replyToContactMessage = async (req, res) => {
 
     if (req.user.role === "Admin") {
       contactMessage.hasUnreadAdminReply = true;
+    } else {
+      contactMessage.isRead = false;
     }
 
     await contactMessage.save();
@@ -301,3 +303,9 @@ export const deleteContactMessage = async (req, res) => {
     });
   }
 };
+
+
+
+/////testing comment
+/////testing comment
+/////testing comment
