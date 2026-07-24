@@ -183,6 +183,14 @@ const orderSchema = new mongoose.Schema(
       ],
       default: "Pending",
     },
+    
+    orderCode: {
+        type: String,
+        unique: true,
+        uppercase: true,
+        trim: true,
+      },
+
   },
   {
     timestamps: true,
