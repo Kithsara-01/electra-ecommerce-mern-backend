@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/Kithsara-01/electra-ecommerce-mern-backend#readme",
   "dependencies": {
+    "@google/genai": "^2.13.0",
     "@supabase/supabase-js": "^2.110.3",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
