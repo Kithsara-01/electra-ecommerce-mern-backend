@@ -1,6 +1,11 @@
 import Product from "../models/product.js";
 import { deleteProductImages } from "../utils/productImageService.js";
 
+import {
+  generateProductDescription,
+  generateAlternativeNames,
+} from "../services/geminiService.js";
+
 // ==============================
 // Create Product
 // ==============================
@@ -187,13 +192,13 @@ export const getAllProducts = async (req, res) => {
     const totalProducts = await Product.countDocuments(filter);
 
     const lowStockCount = await Product.countDocuments({
-        stock: { $gt: 0, $lte: 5 },
-      });
+      stock: { $gt: 0, $lte: 5 },
+    });
 
-      const outOfStockCount = await Product.countDocuments({
-        stock: 0,
-      });
-    
+    const outOfStockCount = await Product.countDocuments({
+      stock: 0,
+    });
+
 
     const products = await Product.find(filter)
       .sort(sortOption)
@@ -201,15 +206,15 @@ export const getAllProducts = async (req, res) => {
       .limit(perPage);
 
     return res.status(200).json({
-        success: true,
-        totalProducts,
-        lowStockCount,
-        outOfStockCount,
-        currentPage,
-        totalPages: Math.ceil(totalProducts / perPage),
-        products,
-      });
-      
+      success: true,
+      totalProducts,
+      lowStockCount,
+      outOfStockCount,
+      currentPage,
+      totalPages: Math.ceil(totalProducts / perPage),
+      products,
+    });
+
   } catch (error) {
     console.error("Get Products Error:", error);
 
@@ -399,7 +404,7 @@ export const deleteProduct = async (req, res) => {
     }
     await deleteProductImages(product.images);
 
-   
+
 
     await Product.deleteOne({
       productId: req.params.productId,
@@ -481,6 +486,71 @@ export const searchProducts = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to search products.",
+    });
+  }
+};
+
+// ==============================
+// Generate AI Product Description
+// ==============================
+export const generateAIProductDescription = async (req, res) => {
+  try {
+    const { productName, category } = req.body;
+
+    if (!productName || !category) {
+      return res.status(400).json({
+        success: false,
+        message: "Product name and category are required.",
+      });
+    }
+
+    const description = await generateProductDescription(
+      productName,
+      category
+    );
+
+    return res.status(200).json({
+      success: true,
+      description,
+    });
+
+  } catch (error) {
+    console.error("Generate AI Description Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to generate product description.",
+    });
+  }
+};
+
+
+export const generateAIAlternativeNames = async (req, res) => {
+  try {
+    const { productName, category } = req.body;
+
+    if (!productName || !category) {
+      return res.status(400).json({
+        success: false,
+        message: "Product name and category are required.",
+      });
+    }
+
+    const alternativeNames = await generateAlternativeNames(
+      productName,
+      category
+    );
+
+    return res.status(200).json({
+      success: true,
+      alternativeNames,
+    });
+  } catch (error) {
+    console.error("AI Alternative Names Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to generate alternative names.",
     });
   }
 };
