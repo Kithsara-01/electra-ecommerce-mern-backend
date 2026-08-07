@@ -15,6 +15,8 @@ import cartRouter from "./routers/cartRouter.js";
 import dashboardRouter from "./routers/dashboardRouter.js";
 import wishlistRouter from "./routers/wishlistRouter.js";
 
+import paymentRouter from "./routers/paymentRouter.js"; // Import the payment router
+
 
 dotenv.config();
 
@@ -42,6 +44,8 @@ app.use("/api/reviews", reviewRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/dashboard", dashboardRouter);
 app.use("/api/wishlist", wishlistRouter);
+
+app.use("/api/payments", paymentRouter); // Use the payment router for payment-related routes
 
 const PORT = process.env.PORT || 3000; // Set the port to the value from environment variable or default to 3000
 
