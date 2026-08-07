@@ -165,10 +165,25 @@ const orderSchema = new mongoose.Schema(
     // ===============================
     paymentMethod: {
       type: String,
-      enum: ["Cash on Delivery"],
+      enum: ["Cash on Delivery", "PayHere"],
       default: "Cash on Delivery",
     },
 
+    paymentStatus: {
+      type: String,
+      enum: ["Pending", "Paid", "Failed"],
+      default: "Pending",
+    },
+
+    transactionId: {
+      type: String,
+      default: "",
+    },
+
+    paidAt: {
+      type: Date,
+    },
+    
     // ===============================
     // Order Status
     // ===============================
@@ -183,13 +198,13 @@ const orderSchema = new mongoose.Schema(
       ],
       default: "Pending",
     },
-    
+
     orderCode: {
-        type: String,
-        unique: true,
-        uppercase: true,
-        trim: true,
-      },
+      type: String,
+      unique: true,
+      uppercase: true,
+      trim: true,
+    },
 
   },
   {
