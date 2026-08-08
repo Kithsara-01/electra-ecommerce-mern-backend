@@ -20,6 +20,11 @@ export const placeOrder = async (req, res) => {
       postalCode,
       deliveryNotes,
       paymentMethod = "Cash on Delivery",
+
+      paymentStatus = "Pending",
+      transactionId = "",
+      paidAt = null,
+
     } = req.body;
 
     // ===============================
@@ -162,7 +167,13 @@ export const placeOrder = async (req, res) => {
       grandTotal,
       totalAmount,
       paymentMethod,
+
+      paymentStatus,
+      transactionId,
+      paidAt,
+
       orderStatus: "Pending",
+
     });
 
     order.orderCode = order._id.toString().slice(-8).toUpperCase();
@@ -285,11 +296,11 @@ export const getAllOrders = async (req, res) => {
     // Search
     if (search) {
       query.$or = [
-          { customerName: { $regex: search, $options: "i" } },
-          { email: { $regex: search, $options: "i" } },
-          { phone: { $regex: search, $options: "i" } },
-          { orderCode: { $regex: search.toUpperCase(), $options: "i" } },
-        ];
+        { customerName: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+        { phone: { $regex: search, $options: "i" } },
+        { orderCode: { $regex: search.toUpperCase(), $options: "i" } },
+      ];
       // Search by full Order ID
       if (/^[a-f\d]{24}$/i.test(search)) {
         query.$or.push({ _id: search });
@@ -303,7 +314,7 @@ export const getAllOrders = async (req, res) => {
 
     const totalOrders = await Order.countDocuments(query);
 
-    
+
 
     const orders = await Order.find(query)
       .sort({ createdAt: -1 })
