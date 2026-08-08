@@ -4,16 +4,32 @@ import Product from "../models/product.js";
 // @desc    Get logged-in user's wishlist
 // @route   GET /api/wishlist
 // @access  Private
+// @desc    Get logged-in user's wishlist
+// @route   GET /api/wishlist
+// @access  Private
 export const getWishlist = async (req, res) => {
   try {
-    const wishlist = await Wishlist.find({ user: req.user._id }).populate(
-      "product"
-    );
+    const wishlist = await Wishlist.find({
+      user: req.user._id,
+    }).populate("product");
+
+    // Remove wishlist items whose products no longer exist
+    const validWishlist = wishlist.filter((item) => item.product);
+
+    const invalidWishlistIds = wishlist
+      .filter((item) => !item.product)
+      .map((item) => item._id);
+
+    if (invalidWishlistIds.length > 0) {
+      await Wishlist.deleteMany({
+        _id: { $in: invalidWishlistIds },
+      });
+    }
 
     res.status(200).json({
       success: true,
-      count: wishlist.length,
-      wishlist,
+      count: validWishlist.length,
+      wishlist: validWishlist,
     });
   } catch (error) {
     res.status(500).json({
