@@ -92,6 +92,20 @@ export const placeOrder = async (req, res) => {
     }
 
     // Create order items
+
+    // Check for products that no longer exist
+    const invalidCartItem = cart.items.find((item) => !item.productId);
+
+    if (invalidCartItem) {
+      return res.status(404).json({
+        success: false,
+        message:
+          "One or more products in your cart are no longer available. Please update your cart and try again.",
+      });
+    }
+
+
+
     const items = cart.items.map((item) => ({
       productId: item.productId._id,
       name: item.productId.name,
