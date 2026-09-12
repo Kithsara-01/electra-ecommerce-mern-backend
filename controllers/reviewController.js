@@ -106,6 +106,30 @@ export const getProductReviews = async (req, res) => {
       });
     }
   };
+
+// Get All Reviews (Admin)
+export const getAllReviews = async (req, res) => {
+  try {
+    const reviews = await Review.find()
+      .populate("customer", "name email profileImage")
+      .populate("product", "productId name image")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      reviews,
+    });
+  } catch (error) {
+    console.error("Get All Reviews Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch reviews.",
+    });
+  }
+};
+
+
 // Update Review
 export const updateReview = async (req, res) => {
   try {
@@ -148,6 +172,44 @@ export const updateReview = async (req, res) => {
 };
 
 // Delete Review
+// export const deleteReview = async (req, res) => {
+//   try {
+//     const review = await Review.findById(req.params.id);
+
+//     if (!review) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Review not found.",
+//       });
+//     }
+
+//     if (review.customer.toString() !== req.user._id.toString()) {
+//       return res.status(403).json({
+//         success: false,
+//         message: "Unauthorized.",
+//       });
+//     }
+
+//     const productId = review.product;
+
+//     await review.deleteOne();
+
+//     await updateProductRating(productId);
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "Review deleted successfully.",
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// };
+
+
+// Delete Review
 export const deleteReview = async (req, res) => {
   try {
     const review = await Review.findById(req.params.id);
@@ -159,10 +221,15 @@ export const deleteReview = async (req, res) => {
       });
     }
 
-    if (review.customer.toString() !== req.user._id.toString()) {
+    const isOwner =
+      review.customer.toString() === req.user._id.toString();
+
+    const isAdmin = req.user.role === "Admin";
+
+    if (!isOwner && !isAdmin) {
       return res.status(403).json({
         success: false,
-        message: "Unauthorized.",
+        message: "You are not authorized to delete this review.",
       });
     }
 
